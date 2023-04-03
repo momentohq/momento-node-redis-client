@@ -270,3 +270,23 @@ export class MomentoRedisClient
     this.emit('error', errorReply);
   }
 }
+
+/* TODO unimplemented commands should return an errror
+function addUnimplementedMethods() {
+  for (const name of Object.keys(RedisCommands)) {
+    const methodName = name as keyof typeof MomentoRedisClient.prototype;
+    if (methodName in MomentoRedisClient) {
+      continue;
+    }
+
+    MomentoRedisClient.prototype[methodName] = function (
+      this: MomentoRedisClient
+    ): void {
+      const error = new ErrorReply(
+        `Command ${name} is not implemented in MomentoRedisClient`
+      );
+      this.emit('error', error);
+    };
+  }
+}
+*/
