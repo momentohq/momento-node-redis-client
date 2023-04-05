@@ -1,6 +1,6 @@
 {
   "name": "momento-redis-client",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Momento wrapper for @redis/client",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
