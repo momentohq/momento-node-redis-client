@@ -17,7 +17,6 @@ import {
   RedisFunctions,
   RedisScripts,
   createClient as createRedisBackedClient,
-  RedisFlushModes,
 } from '@redis/client';
 
 export function testCacheName(): string {
@@ -111,32 +110,25 @@ function setupIntegrationTestWithMomento() {
   return {client: momentoNodeRedisClient};
 }
 
-let nextDatabaseNumber = 0;
-
 function setupIntegrationTestWithRedis() {
   const url = getRedisUrl();
-  const databaseNumber = nextDatabaseNumber;
-  nextDatabaseNumber++;
 
   const client = createRedisBackedClient({
     url: url,
-    database: databaseNumber,
   });
 
   beforeAll(async () => {
     if (!client.isOpen) {
       await client.connect();
     }
-    await client.flushDb(RedisFlushModes.SYNC);
   });
 
   afterAll(async () => {
     // Tidy up after ourselves to not clutter up a long running Redis instance.
     if (!client.isOpen) {
-      await client.connect();
+      return;
     }
 
-    await client.flushDb(RedisFlushModes.SYNC);
     await client.disconnect();
   });
 
