@@ -13,7 +13,7 @@ jobs:
       matrix:
         node: [14, 16, 18]
     name: Test on Node ${{ matrix.node }}
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     env:
       TEST_AUTH_TOKEN: ${{ secrets.ALPHA_TEST_AUTH_TOKEN }}
       TEST_CACHE_NAME: js-redis-client-test-ci
