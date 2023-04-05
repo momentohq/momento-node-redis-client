@@ -1,4 +1,4 @@
-import {SetupIntegrationTest} from './integration-setup';
+import {SetupIntegrationTest, isRedisBackedTest} from './integration-setup';
 import {commandOptions} from '@redis/client';
 import {v4} from 'uuid';
 import {sleep} from './utils';
@@ -212,6 +212,10 @@ describe('get, set, and delete', () => {
     // Because Momento does not track delete status, we default to 1
     const key = v4();
     const deleteResult = await client.del(key);
-    expect(deleteResult).toEqual(1);
+    if (!isRedisBackedTest()) {
+      expect(deleteResult).toEqual(1);
+    } else {
+      expect(deleteResult).toEqual(0);
+    }
   });
 });

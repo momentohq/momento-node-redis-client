@@ -9,13 +9,15 @@ import {
   CredentialProvider,
 } from '@gomomento/sdk';
 
-import {createClient} from '../src/';
+import {createClient as createMomentoBackedClient} from '../src/';
 
 import {
   RedisClientType,
   RedisModules,
   RedisFunctions,
   RedisScripts,
+  createClient as createRedisBackedClient,
+  RedisFlushModes,
 } from '@redis/client';
 
 export function testCacheName(): string {
@@ -58,9 +60,27 @@ function momentoClientForTesting() {
   return new CacheClient(IntegrationTestCacheClientProps);
 }
 
+export function isRedisBackedTest() {
+  return process.env.TEST_REDIS === '1';
+}
+
+function getRedisUrl() {
+  const redisHost = process.env.TEST_REDIS_HOST || 'localhost';
+  const redisPort = process.env.TEST_REDIS_PORT || '6379';
+  return `redis://${redisHost}:${redisPort}`;
+}
+
 export function SetupIntegrationTest(): {
   client: RedisClientType<RedisModules, RedisFunctions, RedisScripts>;
 } {
+  if (isRedisBackedTest()) {
+    return setupIntegrationTestWithRedis();
+  } else {
+    return setupIntegrationTestWithMomento();
+  }
+}
+
+function setupIntegrationTestWithMomento() {
   const cacheName = testCacheName();
 
   beforeAll(async () => {
@@ -83,6 +103,42 @@ export function SetupIntegrationTest(): {
   });
 
   const momentoClient = momentoClientForTesting();
-  const momentoNodeRedisClient = createClient(momentoClient, cacheName);
+  const momentoNodeRedisClient = createMomentoBackedClient(
+    momentoClient,
+    cacheName
+  );
+
   return {client: momentoNodeRedisClient};
+}
+
+let nextDatabaseNumber = 0;
+
+function setupIntegrationTestWithRedis() {
+  const url = getRedisUrl();
+  const databaseNumber = nextDatabaseNumber;
+  nextDatabaseNumber++;
+
+  const client = createRedisBackedClient({
+    url: url,
+    database: databaseNumber,
+  });
+
+  beforeAll(async () => {
+    if (!client.isOpen) {
+      await client.connect();
+    }
+    await client.flushDb(RedisFlushModes.SYNC);
+  });
+
+  afterAll(async () => {
+    // Tidy up after ourselves to not clutter up a long running Redis instance.
+    if (!client.isOpen) {
+      await client.connect();
+    }
+
+    await client.flushDb(RedisFlushModes.SYNC);
+    await client.disconnect();
+  });
+
+  return {client: client};
 }
