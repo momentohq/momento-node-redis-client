@@ -17,6 +17,11 @@ jobs:
     env:
       TEST_AUTH_TOKEN: ${{ secrets.ALPHA_TEST_AUTH_TOKEN }}
       TEST_CACHE_NAME: js-redis-client-test-ci
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
 
     steps:
       - name: Setup repo
@@ -38,5 +43,8 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Test
-        run: npm run test
+      - name: Test using a Momento backend
+        run: npm run test-momento
+
+      - name: Test using a Redis backend
+        run: npm run test-redis
