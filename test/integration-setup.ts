@@ -47,15 +47,14 @@ export async function WithCache(
   }
 }
 
-export const IntegrationTestCacheClientProps: CacheClientProps = {
-  configuration: Configurations.Laptop.latest(),
-  credentialProvider: CredentialProvider.fromEnvironmentVariable({
-    environmentVariableName: 'TEST_AUTH_TOKEN',
-  }),
-  defaultTtlSeconds: 60,
-};
-
 function momentoClientForTesting() {
+  const IntegrationTestCacheClientProps: CacheClientProps = {
+    configuration: Configurations.Laptop.latest(),
+    credentialProvider: CredentialProvider.fromEnvironmentVariable({
+      environmentVariableName: 'TEST_AUTH_TOKEN',
+    }),
+    defaultTtlSeconds: 60,
+  };
   return new CacheClient(IntegrationTestCacheClientProps);
 }
 
