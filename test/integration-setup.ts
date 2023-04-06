@@ -123,7 +123,6 @@ function setupIntegrationTestWithRedis() {
   });
 
   afterAll(async () => {
-    // Tidy up after ourselves to not clutter up a long running Redis instance.
     if (!client.isOpen) {
       return;
     }
