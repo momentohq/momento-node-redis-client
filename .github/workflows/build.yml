@@ -8,7 +8,7 @@ on:
       - main
 
 jobs:
-  test:
+  test-momento:
     strategy:
       matrix:
         node: [14, 16, 18]
@@ -17,6 +17,38 @@ jobs:
     env:
       TEST_AUTH_TOKEN: ${{ secrets.ALPHA_TEST_AUTH_TOKEN }}
       TEST_CACHE_NAME: js-redis-client-test-ci
+
+    steps:
+      - name: Setup repo
+        uses: actions/checkout@v3
+
+      - name: Install Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          node -v
+
+      - name: Build
+        run: npm run build
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test using a Momento backend
+        run: npm run test-momento
+
+  # This is a separate job from than the above because the container services
+  # do not run off the shelf on macos. This is a known issue with GitHub Actions.
+  test-redis:
+    strategy:
+      matrix:
+        node: [14, 16, 18]
+    name: Test on Node ${{ matrix.node }}
+    runs-on: ubuntu-latest
     services:
       redis:
         image: redis
@@ -42,9 +74,6 @@ jobs:
 
       - name: Lint
         run: npm run lint
-
-      - name: Test using a Momento backend
-        run: npm run test-momento
 
       - name: Test using a Redis backend
         run: npm run test-redis
