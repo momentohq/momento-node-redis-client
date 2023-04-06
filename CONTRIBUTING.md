@@ -1,6 +1,6 @@
 # Welcome to the momento-node-redis-client contributing guide :wave:
 
-Thank you for taking your time to contribute to our Node.js SDK!
+Thank you for taking your time to contribute to our Momento @redis/client wrapper!
 <br/>
 This guide will provide you information to start your own development and testing.
 <br/>
