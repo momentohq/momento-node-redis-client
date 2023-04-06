@@ -69,6 +69,7 @@ export class MomentoRedisClient
 {
   private client: CacheClient;
   private cacheName: string;
+  private _isOpen = false;
 
   constructor(client: CacheClient, cacheName: string) {
     super();
@@ -86,13 +87,19 @@ export class MomentoRedisClient
     ) as unknown as RedisClientType<RedisModules, RedisFunctions, RedisScripts>;
   }
 
+  public get isOpen(): boolean {
+    return this._isOpen;
+  }
+
   public async connect(): Promise<void> {
     // TODO this should be ping once it is in the client
     await this.get('sRITPPymF1yEB6rFizrI0ZeCMq012uXFjBNRNokAv4');
+    this._isOpen = true;
   }
 
   public async disconnect(): Promise<void> {
     return await new Promise(resolve => {
+      this._isOpen = false;
       resolve();
     });
   }

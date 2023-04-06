@@ -1,3 +1,82 @@
+# Welcome to the momento-node-redis-client contributing guide :wave:
+
+Thank you for taking your time to contribute to our Momento @redis/client wrapper!
+<br/>
+This guide will provide you information to start your own development and testing.
+<br/>
+Happy coding :dancer:
+<br/>
+
+## Requirements :coffee:
+
+- Node version [14 or higher](https://nodejs.org/en/download/) is required
+- A Momento Auth Token is required, you can generate one using the [Momento CLI](https://github.com/momentohq/momento-cli)
+
+<br/>
+
+## First-time setup :wrench:
+
+```
+# Install dependencies
+npm install
+```
+
+<br />
+
+## Build :computer:
+
+```
+npm run build
+```
+
+<br/>
+
+## Linting :flashlight:
+
+```
+npm run lint
+```
+
+<br/>
+
+## Tests :zap:
+
+### Run integration tests against Momento
+
+```
+TEST_AUTH_TOKEN=<YOUR_AUTH_TOKEN> npm run test-momento
+```
+
+### Run integration tests against Redis
+
+First run Redis either natively, run Redis in a Docker container, or do your development in a devcontainer. Here is an example of running Redis in a Docker container:
+
+```
+docker run -it -p 6379:6379 redis
+```
+
+Then run the tests:
+
+```
+npm run test-redis
+```
+
+This assumes the Redis server is running on `localhost:6379`. If using a different host and port, modify the above command as follows:
+
+```
+TEST_REDIS_HOST=<HOST> TEST_REDIS_PORT=<PORT> npm run test-redis
+```
+
+By running Redis on the local host, you can use the `redis-cli` to inspect the state of the Redis server as well as interactively debug the tests. We have also included a devcontainer config which will mount the entire coding environment into a Docker container, including the Redis server. See `.devcontainer` for more details.
+
+### Run all tests
+
+This will run both the integration tests against Momento and Redis. As above, we assume the Redis server is running on `localhost:6379`.
+
+```
+TEST_AUTH_TOKEN=<YOUR_AUTH_TOKEN> npm run test
+```
+
 # node-redis internals
 
 ## CommandOptions

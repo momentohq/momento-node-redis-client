@@ -9,13 +9,14 @@ import {
   CredentialProvider,
 } from '@gomomento/sdk';
 
-import {createClient} from '../src/';
+import {createClient as createMomentoBackedClient} from '../src/';
 
 import {
   RedisClientType,
   RedisModules,
   RedisFunctions,
   RedisScripts,
+  createClient as createRedisBackedClient,
 } from '@redis/client';
 
 export function testCacheName(): string {
@@ -46,21 +47,38 @@ export async function WithCache(
   }
 }
 
-export const IntegrationTestCacheClientProps: CacheClientProps = {
-  configuration: Configurations.Laptop.latest(),
-  credentialProvider: CredentialProvider.fromEnvironmentVariable({
-    environmentVariableName: 'TEST_AUTH_TOKEN',
-  }),
-  defaultTtlSeconds: 60,
-};
-
 function momentoClientForTesting() {
+  const IntegrationTestCacheClientProps: CacheClientProps = {
+    configuration: Configurations.Laptop.latest(),
+    credentialProvider: CredentialProvider.fromEnvironmentVariable({
+      environmentVariableName: 'TEST_AUTH_TOKEN',
+    }),
+    defaultTtlSeconds: 60,
+  };
   return new CacheClient(IntegrationTestCacheClientProps);
+}
+
+export function isRedisBackedTest() {
+  return process.env.TEST_REDIS === '1';
+}
+
+function getRedisUrl() {
+  const redisHost = process.env.TEST_REDIS_HOST || 'localhost';
+  const redisPort = process.env.TEST_REDIS_PORT || '6379';
+  return `redis://${redisHost}:${redisPort}`;
 }
 
 export function SetupIntegrationTest(): {
   client: RedisClientType<RedisModules, RedisFunctions, RedisScripts>;
 } {
+  if (isRedisBackedTest()) {
+    return setupIntegrationTestWithRedis();
+  } else {
+    return setupIntegrationTestWithMomento();
+  }
+}
+
+function setupIntegrationTestWithMomento() {
   const cacheName = testCacheName();
 
   beforeAll(async () => {
@@ -83,6 +101,34 @@ export function SetupIntegrationTest(): {
   });
 
   const momentoClient = momentoClientForTesting();
-  const momentoNodeRedisClient = createClient(momentoClient, cacheName);
+  const momentoNodeRedisClient = createMomentoBackedClient(
+    momentoClient,
+    cacheName
+  );
+
   return {client: momentoNodeRedisClient};
+}
+
+function setupIntegrationTestWithRedis() {
+  const url = getRedisUrl();
+
+  const client = createRedisBackedClient({
+    url: url,
+  });
+
+  beforeAll(async () => {
+    if (!client.isOpen) {
+      await client.connect();
+    }
+  });
+
+  afterAll(async () => {
+    if (!client.isOpen) {
+      return;
+    }
+
+    await client.disconnect();
+  });
+
+  return {client: client};
 }

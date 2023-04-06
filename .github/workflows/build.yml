@@ -8,7 +8,7 @@ on:
       - main
 
 jobs:
-  test:
+  test-momento:
     strategy:
       matrix:
         node: [14, 16, 18]
@@ -26,6 +26,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
+          cache: npm
 
       - name: Install dependencies
         run: |
@@ -38,5 +39,45 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Test
-        run: npm run test
+      - name: Test using a Momento backend
+        run: npm run test-momento
+
+  # This is a separate job from than the above because the container services
+  # do not run off the shelf on macos. This is a known issue with GitHub Actions.
+  test-redis:
+    strategy:
+      # TODO the redis tests are flaky when run all in parallel.
+      max-parallel: 2
+      matrix:
+        node: [14, 16, 18]
+    name: Test on Node ${{ matrix.node }}
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Setup repo
+        uses: actions/checkout@v3
+
+      - name: Install Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          node -v
+
+      - name: Build
+        run: npm run build
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test using a Redis backend
+        run: npm run test-redis
