@@ -58,7 +58,7 @@ docker run -it -p 6379:6379 redis
 Then run the tests:
 
 ```
-TEST_REDIS=1 npm run test-redis
+npm run test-redis
 ```
 
 This assumes the Redis server is running on `localhost:6379`. If using a different host and port, modify the above command as follows:
