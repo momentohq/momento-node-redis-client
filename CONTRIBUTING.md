@@ -64,7 +64,7 @@ npm run test-redis
 This assumes the Redis server is running on `localhost:6379`. If using a different host and port, modify the above command as follows:
 
 ```
-TEST_REDIS=1 TEST_REDIS_HOST=<HOST> TEST_REDIS_PORT=<PORT> npm run test-redis
+TEST_REDIS_HOST=<HOST> TEST_REDIS_PORT=<PORT> npm run test-redis
 ```
 
 By running Redis on the local host, you can use the `redis-cli` to inspect the state of the Redis server as well as interactively debug the tests. We have also included a devcontainer config which will mount the entire coding environment into a Docker container, including the Redis server. See `.devcontainer` for more details.
