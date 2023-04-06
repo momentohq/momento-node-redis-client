@@ -46,7 +46,7 @@ jobs:
   # do not run off the shelf on macos. This is a known issue with GitHub Actions.
   test-redis:
     strategy:
-      # TODO the redis tests are flaky, so we run them serially for now
+      # TODO the redis tests are flaky when run all in parallel.
       max-parallel: 2
       matrix:
         node: [14, 16, 18]
