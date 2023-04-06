@@ -47,7 +47,7 @@ jobs:
   test-redis:
     strategy:
       # TODO the redis tests are flaky, so we run them serially for now
-      max-parallel: 1
+      max-parallel: 2
       matrix:
         node: [14, 16, 18]
     name: Test on Node ${{ matrix.node }}
