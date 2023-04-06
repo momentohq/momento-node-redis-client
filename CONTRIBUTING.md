@@ -49,7 +49,7 @@ TEST_AUTH_TOKEN=<YOUR_AUTH_TOKEN> npm run test-momento
 
 ### Run integration tests against Redis
 
-First run Redis either natively or in a Docker container. Here is an example of running Redis in a Docker container:
+First run Redis either natively, run Redis in a Docker container, or do your development in a devcontainer. Here is an example of running Redis in a Docker container:
 
 ```
 docker run -it -p 6379:6379 redis
@@ -67,7 +67,7 @@ This assumes the Redis server is running on `localhost:6379`. If using a differe
 TEST_REDIS=1 TEST_REDIS_HOST=<HOST> TEST_REDIS_PORT=<PORT> npm run test-redis
 ```
 
-By running Redis on the local host, you can use the `redis-cli` to inspect the state of the Redis server as well as interactively debug the tests.
+By running Redis on the local host, you can use the `redis-cli` to inspect the state of the Redis server as well as interactively debug the tests. We have also included a devcontainer config which will mount the entire coding environment into a Docker container, including the Redis server. See `.devcontainer` for more details.
 
 ### Run all tests
 

@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  devcontainer:
+    image: mcr.microsoft.com/devcontainers/typescript-node:0-16
+    volumes:
+      - ../..:/workspaces:cached
+    environment:
+      - TEST_AUTH_TOKEN
+    network_mode: service:redis
+    command: sleep infinity
+
+  redis:
+    image: redis:latest
+    restart: unless-stopped
+    ports:
+      - 6379:6379
