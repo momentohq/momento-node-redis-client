@@ -13,7 +13,7 @@
     "format": "eslint . --ext .ts --fix",
     "watch": "tsc -w",
     "build": "rm -rf dist && tsc",
-    "test": "jest && TEST_REDIS=1 jest",
+    "test": "npm run test-momento && npm run test-redis",
     "test-momento": "jest",
     "test-redis": "TEST_REDIS=1 jest"
   },
