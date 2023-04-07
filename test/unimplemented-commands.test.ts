@@ -1,5 +1,4 @@
 import {SetupIntegrationTest, isRedisBackedTest} from './integration-setup';
-//import {sleep} from './utils';
 
 const {client} = SetupIntegrationTest();
 
