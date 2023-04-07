@@ -174,25 +174,30 @@ export class MomentoRedisClient
     if (options?.EX !== undefined) {
       ttl = options.EX;
     } else if (options?.PX !== undefined) {
-      // TODO test dividing by 1000
       ttl = options.PX / 1000;
     } else if (options?.EXAT !== undefined) {
       ttl = options.EXAT - Math.floor(Date.now() / 1000);
     } else if (options?.PXAT !== undefined) {
       ttl = Math.floor((options.PXAT - Date.now()) / 1000);
     } else if (options?.KEEPTTL) {
-      // Unsupported
+      throw new TypeError(
+        'SetOption KEEPTTL is not implemented in MomentoRedisClient'
+      );
     }
 
     if (options?.NX) {
       const stored = await this.setNX(key, value, {ttl});
       return stored ? OK : null;
     } else if (options?.XX) {
-      // unsupportedargs.push('XX');
+      throw new TypeError(
+        'SetOption XX is not implemented in MomentoRedisClient'
+      );
     }
 
     if (options?.GET) {
-      // unsupported
+      throw new TypeError(
+        'SetOption GET is not implemented in MomentoRedisClient'
+      );
     }
 
     const response = await this.client.set(this.cacheName, key, value, {
