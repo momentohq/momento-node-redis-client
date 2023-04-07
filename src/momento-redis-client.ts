@@ -308,11 +308,9 @@ function addUnimplementedMethods(BaseClass: any) {
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
     BaseClass.prototype[methodName] = function (this: any): void {
-      const error = new ErrorReply(
+      throw new TypeError(
         `Command ${name} is not implemented in MomentoRedisClient`
       );
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      this.emit('error', error);
     };
   }
 }
