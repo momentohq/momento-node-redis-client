@@ -50,6 +50,8 @@ const UNEXPECTED_RESPONSE = new ErrorReply('Unexpected response');
 export interface IMomentoRedisClient {
   connect(): Promise<void>;
   disconnect(): Promise<void>;
+  isOpen: boolean;
+
   get(
     ...args: WithOptionalOptions<GetParams>
   ): Promise<OptionalRedisCommandArgument>;
