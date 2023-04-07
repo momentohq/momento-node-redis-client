@@ -18,6 +18,7 @@ import {IResponseError} from '@gomomento/sdk/dist/src/messages/responses/respons
 
 import {ClientCommandOptions} from '@redis/client/dist/lib/client';
 import {isCommandOptions} from '@redis/client/dist/lib/command-options';
+import RedisCommands from '@redis/client/dist/lib/cluster/commands';
 import {RedisCommandArgument} from '@redis/client/dist/lib/commands';
 import {ErrorReply} from '@redis/client/dist/lib/errors';
 import {EventEmitter} from 'stream';
@@ -278,22 +279,40 @@ export class MomentoRedisClient
   }
 }
 
-/* TODO unimplemented commands should return an errror
-function addUnimplementedMethods() {
+/**
+ * Add in stubs for all the Redis commands that we don't implement.
+ * Emits an error if they are called.
+ *
+ * @remarks There are many Redis commands we have not implemented in
+ * this client yet. In order to improve usability, we add in stubs for
+ * all the commands that we don't implement. When the stubs are called,
+ * they emit an error. That way the user gets a reasonable error message
+ * instead of a generic TypeError.
+ * @param BaseClass The class to attach the unimplemented methods to.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function addUnimplementedMethods(BaseClass: any) {
+  // A note on the implementation:
+  // This is only to add extra methods dynamically to `MomentoRedisClient`
+  // The proper way to do this is to use declaration merging, see:
+  // https://www.typescriptlang.org/docs/handbook/declaration-merging.html#module-augmentation.
+  // Though that is the proper way, we would have to make an interface with hundreds of methods.
+  // To sidestep this, in this implementation we erase the type (use `any`) and add new methods
+  // to the prototype without a separate interface. Hence the TypeScript and eslint disable comments.
   for (const name of Object.keys(RedisCommands)) {
-    const methodName = name as keyof typeof MomentoRedisClient.prototype;
-    if (methodName in MomentoRedisClient) {
+    const methodName = name as keyof typeof BaseClass;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    if (methodName in BaseClass.prototype) {
       continue;
     }
 
-    MomentoRedisClient.prototype[methodName] = function (
-      this: MomentoRedisClient
-    ): void {
-      const error = new ErrorReply(
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
+    BaseClass.prototype[methodName] = function (this: any): void {
+      throw new TypeError(
         `Command ${name} is not implemented in MomentoRedisClient`
       );
-      this.emit('error', error);
     };
   }
 }
-*/
+
+addUnimplementedMethods(MomentoRedisClient);
