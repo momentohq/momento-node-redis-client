@@ -80,6 +80,15 @@ async function main(): Promise<void> {
   const setnxReturnValue2 = await client.setNX(randomKey, v4());
   console.log(`setNX "${randomKey}": ${setnxReturnValue2.toString()}`);
 
+  const hSetResponse = await client.hSet('hash', {three: 3, four: 4});
+  console.log(hSetResponse);
+
+  const hGetAllResponse = await client.hGetAll(
+    commandOptions({returnBuffers: false}),
+    'hash'
+  );
+  console.log(hGetAllResponse);
+
   await client.disconnect();
 }
 
