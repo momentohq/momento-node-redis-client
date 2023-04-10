@@ -12,6 +12,8 @@ import {
   CacheSet,
   CacheSetIfNotExists,
   CacheDelete,
+  CacheDictionaryFetch,
+  CacheDictionarySetFields,
 } from '@gomomento/sdk';
 
 import {IResponseError} from '@gomomento/sdk/dist/src/messages/responses/response-base';
@@ -38,7 +40,17 @@ type SetNXParams = [
   options: {ttl?: number}
 ];
 
-type CommandParams = GetParams | SetParams | SetNXParams | DelParams;
+type HGetAllParams = [key: RedisCommandArgument];
+type HSetParams = Parameters<
+  (typeof RedisCommands)['HSET']['transformArguments']
+>;
+
+type CommandParams =
+  | GetParams
+  | SetParams
+  | SetNXParams
+  | DelParams
+  | HSetParams;
 type WithOptionalOptions<T extends CommandParams> =
   | T
   | [options: ClientCommandOptions, ...args: T];
@@ -64,6 +76,13 @@ export interface IMomentoRedisClient {
   SETNX: IMomentoRedisClient['setNX'];
   del(...args: WithOptionalOptions<DelParams>): Promise<number>;
   DEL: IMomentoRedisClient['del'];
+
+  hGetAll(
+    ...args: WithOptionalOptions<HGetAllParams>
+  ): Promise<Record<string, RedisCommandArgument>>;
+  HGETALL: IMomentoRedisClient['hGetAll'];
+  hSet(...args: WithOptionalOptions<HSetParams>): Promise<number>;
+  HSET: IMomentoRedisClient['hSet'];
 }
 
 export class MomentoRedisClient
@@ -272,6 +291,82 @@ export class MomentoRedisClient
     if (response instanceof CacheDelete.Success) {
       return 1;
     } else if (response instanceof CacheDelete.Error) {
+      this.emit('error', response);
+    } else {
+      this.emit('error', UNEXPECTED_RESPONSE);
+    }
+    return 0;
+  }
+
+  public async hGetAll(
+    ...args: WithOptionalOptions<HGetAllParams>
+  ): Promise<Record<string, RedisCommandArgument>> {
+    const [returnBuffers, otherArgs] =
+      MomentoRedisClient.extractReturnBuffersOptionFromArgs(args);
+    return await this.sendHGetAll(returnBuffers, otherArgs as HGetAllParams);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/unbound-method
+  public HGETALL = this.hGetAll;
+
+  private async sendHGetAll(
+    returnBuffers: boolean,
+    [key]: [key: RedisCommandArgument]
+  ): Promise<Record<string, RedisCommandArgument>> {
+    const response = await this.client.dictionaryFetch(
+      this.cacheName,
+      key.toString()
+    );
+    if (response instanceof CacheDictionaryFetch.Hit) {
+      if (returnBuffers) {
+        const record = response.valueRecordStringUint8Array();
+        const newRecord: Record<string, Buffer> = {};
+        for (const [key, value] of Object.entries(record)) {
+          newRecord[key] = Buffer.from(value);
+        }
+        return newRecord;
+      } else {
+        return response.valueRecordStringString();
+      }
+    } else if (response instanceof CacheDictionaryFetch.Miss) {
+      return {};
+    } else if (response instanceof CacheDictionaryFetch.Error) {
+      this.emit('error', response);
+    } else {
+      this.emit('error', UNEXPECTED_RESPONSE);
+    }
+    return {};
+  }
+
+  public async hSet(...args: WithOptionalOptions<HSetParams>): Promise<number> {
+    const [, otherArgs] =
+      MomentoRedisClient.extractReturnBuffersOptionFromArgs(args);
+    return await this.sendHSet(otherArgs);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/unbound-method
+  public HSET = this.hSet;
+
+  private async sendHSet(args: HSetParams): Promise<number> {
+    const transformed = RedisCommands['HSET'].transformArguments(...args);
+    console.log(args);
+    console.log(transformed);
+
+    const key = transformed[1].toString();
+    const newObject: Record<string, RedisCommandArgument> = {};
+    for (let i = 2; i < transformed.length; i += 2) {
+      newObject[transformed[i].toString()] = transformed[i + 1];
+    }
+
+    const response = await this.client.dictionarySetFields(
+      this.cacheName,
+      key,
+      newObject
+    );
+
+    if (response instanceof CacheDictionarySetFields.Success) {
+      return Object.keys(newObject).length;
+    } else if (response instanceof CacheDictionarySetFields.Error) {
       this.emit('error', response);
     } else {
       this.emit('error', UNEXPECTED_RESPONSE);
