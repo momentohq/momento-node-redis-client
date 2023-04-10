@@ -3,93 +3,134 @@ import {
   RedisModules,
   RedisFunctions,
   RedisScripts,
-  commandOptions as nodeRedisCommandOptions,
 } from '@redis/client';
-import {Command, Option} from 'commander';
-import * as MomentoRedis from 'momento-redis-client';
-import {Momento} from 'momento-redis-client';
-import * as Redis from './redis-client';
-import {v4} from 'uuid';
+import * as nodeRedis from '@redis/client';
+import {Command, Option, OptionValues} from 'commander';
+import * as momentoRedis from 'momento-redis-client';
+import {momento, commandOptions} from 'momento-redis-client';
 
 async function main(): Promise<void> {
-  const program = new Command();
-  program
-    .addOption(new Option('-r --redis', 'use redis'))
-    .addOption(new Option('-m --momento', 'use momento').conflicts('redis'))
-    .addOption(new Option('-k --key <key>', 'key').default('key'))
-    .addOption(new Option('-v --value <value>', 'value').default('value'))
-    .addOption(
-      new Option('-c --cacheName <cacheName>', 'cacheName').default('cache')
-    )
-    .addOption(new Option('--ttl <ttl>', 'ttl').default('60'));
-  program.parse(process.argv);
-  const options = program.opts();
+  const options = parseCliOpts();
 
-  // Initialize client
-  let client: RedisClientType<RedisModules, RedisFunctions, RedisScripts>;
-  let commandOptions: typeof nodeRedisCommandOptions;
-  if (options.redis) {
-    client = Redis.createClient();
-    commandOptions = nodeRedisCommandOptions;
-    console.log('using node-redis');
-  } else if (options.momento) {
-    client = MomentoRedis.createClient(
-      new Momento.CacheClient({
-        configuration: Momento.Configurations.Laptop.v1(),
-        credentialProvider: Momento.CredentialProvider.fromEnvironmentVariable({
-          environmentVariableName: 'MOMENTO_AUTH_TOKEN',
-        }),
-        defaultTtlSeconds: options.ttl as number,
-      }),
-      options.cacheName as string
-    );
-    commandOptions = MomentoRedis.commandOptions;
-    console.log('using momento-node-redis');
-  } else {
-    throw new Error('invalid option. need to specify one of momento or redis');
-  }
+  // This will construct a regular node-redis client, or a momento-backed redis client,
+  //  depending on which CLI options you pass.
+  const client: RedisClientType<RedisModules, RedisFunctions, RedisScripts> =
+    await initializeRedisClient(options);
 
-  const [key, value] = [options.key as string, options.value as string];
+  const key = 'key1';
+  const value = 'value=';
 
+  // From this point forward the code will work with either Momento or Redis, with no changes!
   client.on('error', err => console.error('Redis Client Error', err));
   await client.connect();
 
+  console.log('');
+  console.log(`Issuing a 'get' for key '${key}', which we have not yet set.`);
   const getValue = await client.get(key);
-  console.log(`get "${key}": "${getValue ?? 'null'}"`);
+  console.log(`result '${getValue ?? 'null'}'`);
 
+  console.log('');
+  console.log(`Issuing a 'set' for key '${key}', with value '${value}'.`);
   const setReturnValue = await client.set(key, value, {EX: 60, NX: true});
+  console.log(`result: ${setReturnValue?.toString() ?? 'null'}`);
+
+  console.log('');
+  console.log(`Issuing another 'get' for key ${key}.`);
+  const getValue2 = await client.get(key);
   console.log(
-    `set "${key}"="${value}": ${setReturnValue?.toString() ?? 'null'}`
+    `result: '${getValue2?.toString() ?? 'null'}' (${
+      getValue2?.constructor?.name ?? 'null'
+    })`
   );
 
-  const getValue2 = await client.get(
+  console.log('');
+  console.log(
+    `Issuing another 'get' for key ${key}, with returnBuffers: true.`
+  );
+  const getValue3 = await client.get(
     commandOptions({returnBuffers: true}),
     key
   );
   console.log(
-    `get "${key}": "${getValue2?.toString() ?? 'null'}" (${typeof getValue2})`
+    `result: '${getValue3?.toString() ?? 'null'}' (${
+      getValue3?.constructor?.name ?? 'null'
+    })`
   );
 
-  const randomKey = v4();
-  const setnxReturnValue = await client.setNX(
-    commandOptions({returnBuffers: true}),
-    randomKey,
-    v4()
+  console.log('');
+  const hashKey = 'key2';
+  const hashValue = {three: 3, four: 4};
+  console.log(
+    `Issuing an HSET for key '${hashKey}' with value: ${JSON.stringify(
+      hashValue
+    )}`
   );
-  console.log(`setNX "${randomKey}": ${setnxReturnValue.toString()}`);
-  const setnxReturnValue2 = await client.setNX(randomKey, v4());
-  console.log(`setNX "${randomKey}": ${setnxReturnValue2.toString()}`);
+  const hSetResponse = await client.hSet(hashKey, hashValue);
+  console.log(`result: ${hSetResponse}`);
 
-  const hSetResponse = await client.hSet('hash', {three: 3, four: 4});
-  console.log(hSetResponse);
-
+  console.log('');
+  console.log(`Issuing an HGETALL for key '${hashKey}'.`);
   const hGetAllResponse = await client.hGetAll(
     commandOptions({returnBuffers: false}),
-    'hash'
+    hashKey
   );
-  console.log(hGetAllResponse);
+  console.log(`result: ${JSON.stringify(hGetAllResponse)}`);
+
+  console.log('');
 
   await client.disconnect();
+}
+
+function parseCliOpts() {
+  const program = new Command();
+  program
+    .addOption(new Option('-r --redis', 'use redis'))
+    .addOption(new Option('-m --momento', 'use momento').conflicts('redis'))
+    .addOption(
+      new Option('-c --cacheName <cacheName>', 'cacheName').default('cache')
+    )
+    .addOption(new Option('--ttl <ttl>', 'ttl').default('60'))
+    .showHelpAfterError(true);
+  program.parse(process.argv);
+  const options = program.opts();
+  if (!(options.momento || options.redis)) {
+    console.error(
+      'Missing required argument; you must specify either --momento or --redis\n'
+    );
+    program.help();
+    throw new Error('Missing required argument');
+  }
+  return options;
+}
+
+async function initializeRedisClient(
+  options: OptionValues
+): Promise<RedisClientType<RedisModules, RedisFunctions, RedisScripts>> {
+  if (options.redis) {
+    console.log('using node-redis');
+    return nodeRedis.createClient();
+  } else if (options.momento) {
+    const cacheName = options.cacheName as string;
+    console.log(`using momento-node-redis with cache '${cacheName}'`);
+    const momentoClient = createMomentoClient(options.ttl as number);
+    // This is only necessary if you have not already created your momento cache!
+    await momentoClient.createCache(cacheName);
+    return momentoRedis.createClient(momentoClient, cacheName);
+  } else {
+    throw new Error('invalid option. need to specify one of momento or redis');
+  }
+}
+
+// type CacheClient = Momento.CacheClient;
+
+function createMomentoClient(defaultTtlSeconds: number): momento.CacheClient {
+  return new momento.CacheClient({
+    configuration: momento.Configurations.Laptop.v1(),
+    credentialProvider: momento.CredentialProvider.fromEnvironmentVariable({
+      environmentVariableName: 'MOMENTO_AUTH_TOKEN',
+    }),
+    defaultTtlSeconds: defaultTtlSeconds,
+  });
 }
 
 main()

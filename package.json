@@ -7,10 +7,6 @@
   "files": [
     "dist/src"
   ],
-  "exports": {
-    ".": "./dist/src/index.js",
-    "./momento": "./dist/src/momento/index.js"
-  },
   "scripts": {
     "prebuild": "eslint . --ext .ts",
     "lint": "eslint . --ext .ts",

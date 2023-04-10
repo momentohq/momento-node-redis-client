@@ -1,13 +1,13 @@
 import express from 'express';
 import session from 'express-session';
 import RedisStore from 'connect-redis';
-import {createClient, Momento} from 'momento-redis-client';
+import {createClient, momento} from 'momento-redis-client';
 
 // Initialize client
 const redisClient = createClient(
-  new Momento.CacheClient({
-    configuration: Momento.Configurations.Laptop.v1(),
-    credentialProvider: Momento.CredentialProvider.fromEnvironmentVariable({
+  new momento.CacheClient({
+    configuration: momento.Configurations.Laptop.v1(),
+    credentialProvider: momento.CredentialProvider.fromEnvironmentVariable({
       environmentVariableName: 'MOMENTO_AUTH_TOKEN',
     }),
     defaultTtlSeconds: 60,
