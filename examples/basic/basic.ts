@@ -7,13 +7,9 @@ import {
 } from '@redis/client';
 import {Command, Option} from 'commander';
 import * as MomentoRedis from 'momento-redis-client';
+import {Momento} from 'momento-redis-client';
 import * as Redis from './redis-client';
 import {v4} from 'uuid';
-import {
-  CacheClient,
-  Configurations,
-  CredentialProvider,
-} from 'momento-redis-client/node_modules/@gomomento/sdk'; // TODO change this once client is published
 
 async function main(): Promise<void> {
   const program = new Command();
@@ -38,9 +34,9 @@ async function main(): Promise<void> {
     console.log('using node-redis');
   } else if (options.momento) {
     client = MomentoRedis.createClient(
-      new CacheClient({
-        configuration: Configurations.Laptop.v1(),
-        credentialProvider: CredentialProvider.fromEnvironmentVariable({
+      new Momento.CacheClient({
+        configuration: Momento.Configurations.Laptop.v1(),
+        credentialProvider: Momento.CredentialProvider.fromEnvironmentVariable({
           environmentVariableName: 'MOMENTO_AUTH_TOKEN',
         }),
         defaultTtlSeconds: options.ttl as number,
