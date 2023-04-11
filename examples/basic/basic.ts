@@ -121,7 +121,6 @@ async function initializeRedisClient(
   }
 }
 
-// type CacheClient = Momento.CacheClient;
 
 function createMomentoClient(defaultTtlSeconds: number): momento.CacheClient {
   return new momento.CacheClient({
