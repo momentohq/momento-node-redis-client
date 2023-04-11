@@ -1,4 +1,8 @@
-# What and Why?
+{{ ossHeader }}
+
+# Momento Node.js Redis Client
+
+## What and why?
 
 This project provides a Momento-backed implementation of [@redis/client](https://github.com/redis/node-redis)
 The goal is to provide a drop-in replacement for [@redis/client](https://github.com/redis/node-redis) so that you can
@@ -146,3 +150,5 @@ Then, open a private/icognito browser window (or a different browser) and browse
 a fresh session with an independent counter.
 
 Voila! Your express.js session data is now stored in Momento!
+
+{{ ossFooter }}
