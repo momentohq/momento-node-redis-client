@@ -43,9 +43,6 @@ async function main(): Promise<void> {
     })`
   );
 
-  const sAddResponse = client.sAdd('setkey', 'taco');
-  console.log(sAddResponse);
-
   console.log('');
   console.log(
     `Issuing another 'get' for key ${key}, with returnBuffers: true.`
