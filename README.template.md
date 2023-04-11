@@ -4,8 +4,8 @@ This project provides a Momento-backed implementation of [@redis/client](https:/
 The goal is to provide a drop-in replacement for [@redis/client](https://github.com/redis/node-redis) so that you can
 use the same code with either a Redis server or with Momento serverless cache!
 
-This means you can also use Momento as your cache engine for any node.js frameworks that support a redis-backed cache,
-such as [Express.js](https://github.com/expressjs/express).  See the [Examples](#examples) section for more info.
+You can use Momento as your cache engine for any node.js frameworks that support a redis-backed cache,
+such as [Express.js](https://github.com/expressjs/express). See the [Examples](#examples) section for more info.
 
 # Usage
 
@@ -58,25 +58,25 @@ const redisClient = createClient(
 </tr>
 </table>
 
-**NOTE**: the Momento `@redis/client` implementation currently supports simple key/value pairs (`GET`, `SET`) as well
-as hash values (`HGET`/`HSET`).  If you need support for additional Redis functions, please contact us at [support@momentohq.com](mailto:support@momentohq.com)
+**NOTE**: The Momento `@redis/client` implementation currently supports simple key/value pairs (`GET`, `SET`) as well
+as hash values (`HGET`/`HSET`). If you need support for additional Redis functions, please contact us at [support@momentohq.com](mailto:support@momentohq.com)
 or join our [Discord](https://discord.com/invite/3HkAKjUZGq), and we will be happy to help!
 
 # Examples
 
 ## Prerequisites
 
-To run these examples, you will need a Momento Auth Token.  You can generate one using the [Momento CLI](https://github.com/momentohq/momento-cli).
+To run these examples, you will need a Momento Auth Token. You can generate one using the [Momento CLI](https://github.com/momentohq/momento-cli).
 
-The examples will consume your auth token via the environment variable `MOMENTO_AUTH_TOKEN`.
+The examples will utlize your auth token via the environment variable `MOMENTO_AUTH_TOKEN` you set.
 
-## basic
+## Basic example
 
 In the [`examples/basic`](./examples/basic) directory, you will find a simple CLI app that does some basic sets and gets
-on string and hash values.  You can pass the `--momento` flag to run against Momento, or the `--redis` flag to run against
+on string and hash values. You can pass the `--momento` flag to run against Momento, or the `--redis` flag to run against
 a local Redis (127.0.0.0:6379).
 
-You can run the example via `npm run basic`.  To pass CLI options you will need to pass an extra `--` to tell `npm` that
+You can run the example via `npm run basic`. To pass CLI options you will need to pass an extra `--` to tell `npm` that
 the following options should be passed through.
 
 Here's an example run against Momento:
@@ -88,7 +88,7 @@ npm install
 npm run basic -- --momento
 ```
 
-And the output will look something like this:
+And the output should look something like this:
 
 ```bash
 
@@ -140,12 +140,12 @@ You will see something like this:
 Example app listening at http://localhost:3000
 ```
 
-Now, open a browser to `http://localhost:3000` and reload the page a few times.  You'll see that the Momento-backed
+Now, open a browser to `http://localhost:3000` and reload the page a few times. You'll see that the Momento-backed
 express session is recognized and you should see the page load count increase each time.
 
-Then, open a private/icognito browser window (or a different browser) and browse to the same URL.  You should see
+Then, open a private/icognito browser window (or a different browser) and browse to the same URL. You should see
 a fresh session with an independent counter.
 
-Voila!  Your express.js session data is now stored in Momento!
+Voila! Your express.js session data is now stored in Momento!
 
 
