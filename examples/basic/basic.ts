@@ -43,6 +43,9 @@ async function main(): Promise<void> {
     })`
   );
 
+  const sAddResponse = client.sAdd('setkey', 'taco');
+  console.log(sAddResponse);
+
   console.log('');
   console.log(
     `Issuing another 'get' for key ${key}, with returnBuffers: true.`
@@ -120,7 +123,6 @@ async function initializeRedisClient(
     throw new Error('invalid option. need to specify one of momento or redis');
   }
 }
-
 
 function createMomentoClient(defaultTtlSeconds: number): momento.CacheClient {
   return new momento.CacheClient({
