@@ -349,7 +349,6 @@ export class MomentoRedisClient
 
   private async sendHSet(args: HSetParams): Promise<number> {
     const transformed = RedisCommands['HSET'].transformArguments(...args);
-    // console.log(args);
 
     const key = transformed[1].toString();
     const newObject: Record<string, RedisCommandArgument> = {};
