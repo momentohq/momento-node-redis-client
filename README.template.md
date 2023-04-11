@@ -1,4 +1,8 @@
-# What and Why?
+{{ ossHeader }}
+
+# Momento Node.js Redis Client
+
+## What and why?
 
 This project provides a Momento-backed implementation of [@redis/client](https://github.com/redis/node-redis)
 The goal is to provide a drop-in replacement for [@redis/client](https://github.com/redis/node-redis) so that you can
@@ -7,11 +11,10 @@ use the same code with either a Redis server or with Momento serverless cache!
 You can use Momento as your cache engine for any node.js frameworks that support a redis-backed cache,
 such as [Express.js](https://github.com/expressjs/express). See the [Examples](#examples) section for more info.
 
-# Usage
+## Usage
 
 To switch your existing `@redis/client` application to use Momento, you only need to change the code where you construct
 your client object:
-
 
 <table>
 <tr>
@@ -62,15 +65,15 @@ const redisClient = createClient(
 as hash values (`HGET`/`HSET`). If you need support for additional Redis functions, please contact us at [support@momentohq.com](mailto:support@momentohq.com)
 or join our [Discord](https://discord.com/invite/3HkAKjUZGq), and we will be happy to help!
 
-# Examples
+## Examples
 
-## Prerequisites
+### Prerequisites
 
 To run these examples, you will need a Momento Auth Token. You can generate one using the [Momento CLI](https://github.com/momentohq/momento-cli).
 
 The examples will utlize your auth token via the environment variable `MOMENTO_AUTH_TOKEN` you set.
 
-## Basic example
+### Basic example
 
 In the [`examples/basic`](./examples/basic) directory, you will find a simple CLI app that does some basic sets and gets
 on string and hash values. You can pass the `--momento` flag to run against Momento, or the `--redis` flag to run against
@@ -117,7 +120,7 @@ result: {"three":"3","four":"4"}
 done
 ```
 
-## express-session
+### express-session
 
 This directory contains an [Express.js](https://github.com/expressjs/express) app with
 [express-session](https://github.com/expressjs/session) and the [connect-redis](https://github.com/tj/connect-redis) backend.
@@ -148,4 +151,4 @@ a fresh session with an independent counter.
 
 Voila! Your express.js session data is now stored in Momento!
 
-
+{{ ossFooter }}

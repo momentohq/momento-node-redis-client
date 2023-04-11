@@ -121,7 +121,6 @@ async function initializeRedisClient(
   }
 }
 
-
 function createMomentoClient(defaultTtlSeconds: number): momento.CacheClient {
   return new momento.CacheClient({
     configuration: momento.Configurations.Laptop.v1(),
