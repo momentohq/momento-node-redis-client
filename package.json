@@ -1,5 +1,5 @@
 {
-  "name": "momento-redis-client",
+  "name": "@gomomento-poc/node-redis-client",
   "version": "0.1.0",
   "description": "Momento wrapper for @redis/client",
   "main": "dist/src/index.js",
