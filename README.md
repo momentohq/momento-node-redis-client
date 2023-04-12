@@ -1,6 +1,6 @@
 <img src="https://docs.momentohq.com/img/logo.svg" alt="logo" width="400"/>
 
-[![project status](https://momentohq.github.io/standards-and-practices/badges/project-status-incubating.svg)](https://github.com/momentohq/standards-and-practices/blob/main/docs/momento-on-github.md)
+[![project status](https://momentohq.github.io/standards-and-practices/badges/project-status-official.svg)](https://github.com/momentohq/standards-and-practices/blob/main/docs/momento-on-github.md)
 [![project stability](https://momentohq.github.io/standards-and-practices/badges/project-stability-alpha.svg)](https://github.com/momentohq/standards-and-practices/blob/main/docs/momento-on-github.md) 
 
 
@@ -68,6 +68,15 @@ const redisClient = createClient(
 **NOTE**: The Momento `@redis/client` implementation currently supports simple key/value pairs (`GET`, `SET`) as well
 as hash values (`HGET`/`HSET`). We will continue to add support for additional Redis APIs in the future; for more
 information see the [Current Redis API Support](#current-redis-api-support) section later in this doc.
+
+## Installation
+
+The Momento Node.js redis client is [available on npm.js](https://www.npmjs.com/package/@gomomento-poc/node-redis-client).
+You can install it via:
+
+```bash
+npm install @gomomento-poc/node-redis-client
+```
 
 ## Examples
 
