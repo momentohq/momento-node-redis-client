@@ -36,7 +36,7 @@
     "@types/commander": "^2.12.2",
     "@types/uuid": "^9.0.1",
     "commander": "^10.0.0",
-    "@gomomento-poc/node-redis-client": "0.1.4",
+    "@gomomento-poc/node-redis-client": "0.2.0",
     "uuid": "^9.0.0"
   },
   "prettier": {
