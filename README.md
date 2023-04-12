@@ -10,7 +10,7 @@
 
 This project provides a Momento-backed implementation of [@redis/client](https://github.com/redis/node-redis)
 The goal is to provide a drop-in replacement for [@redis/client](https://github.com/redis/node-redis) so that you can
-use the same code with either a Redis server or with Momento Cache and Momento Topics services!
+use the same code with either a Redis server or with the Momento Cache service!
 
 You can use Momento as your cache engine for any node.js frameworks that support a redis-backed cache,
 such as [Express.js](https://github.com/expressjs/express). See the [Examples](#examples) section for more info.
