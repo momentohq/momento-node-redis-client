@@ -15,7 +15,7 @@ const testAwaitedException = async (
   }
 };
 
-describe('uninmplemented commands', () => {
+describe('unimplemented commands', () => {
   it('should throw an error when the command is not implemented', async () => {
     if (isRedisBackedTest()) {
       return;
@@ -23,11 +23,11 @@ describe('uninmplemented commands', () => {
 
     await testAwaitedException(async () => {
       await client.hGet('foo', 'bar');
-    }, 'Command hGet is not implemented in MomentoRedisClient');
+    }, 'Command hGet is not yet implemented in MomentoRedisClient. But we would love to add it for you!  Please drop by our Discord at https://discord.com/invite/3HkAKjUZGq , or contact us at support@momentohq.com, and let us know what APIs you need!');
 
     await testAwaitedException(async () => {
       await client.lPushX('foo', 'bar');
-    }, 'Command lPushX is not implemented in MomentoRedisClient');
+    }, 'Command lPushX is not yet implemented in MomentoRedisClient. But we would love to add it for you!  Please drop by our Discord at https://discord.com/invite/3HkAKjUZGq , or contact us at support@momentohq.com, and let us know what APIs you need!');
   });
 
   it('should throw an error when an unsupported set option KEEPTTL is used', async () => {
@@ -37,7 +37,7 @@ describe('uninmplemented commands', () => {
 
     await testAwaitedException(async () => {
       await client.set('foo', 'bar', {KEEPTTL: true});
-    }, 'SetOption KEEPTTL is not implemented in MomentoRedisClient');
+    }, 'SetOption KEEPTTL is not yet implemented in MomentoRedisClient. But we would love to add it for you!  Please drop by our Discord at https://discord.com/invite/3HkAKjUZGq , or contact us at support@momentohq.com, and let us know what APIs you need!');
   });
 
   it('should throw an error when an unsupported set option XX is used', async () => {
@@ -47,7 +47,7 @@ describe('uninmplemented commands', () => {
 
     await testAwaitedException(async () => {
       await client.set('foo', 'bar', {XX: true});
-    }, 'SetOption XX is not implemented in MomentoRedisClient');
+    }, 'SetOption XX is not yet implemented in MomentoRedisClient. But we would love to add it for you!  Please drop by our Discord at https://discord.com/invite/3HkAKjUZGq , or contact us at support@momentohq.com, and let us know what APIs you need!');
   });
 
   it('should throw an error when an unsupported set option GET is used', async () => {
@@ -57,6 +57,6 @@ describe('uninmplemented commands', () => {
 
     await testAwaitedException(async () => {
       await client.set('foo', 'bar', {GET: true});
-    }, 'SetOption GET is not implemented in MomentoRedisClient');
+    }, 'SetOption GET is not yet implemented in MomentoRedisClient. But we would love to add it for you!  Please drop by our Discord at https://discord.com/invite/3HkAKjUZGq , or contact us at support@momentohq.com, and let us know what APIs you need!');
   });
 });

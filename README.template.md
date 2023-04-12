@@ -18,11 +18,11 @@ your client object:
 
 <table>
 <tr>
-  <td width="50%">With node-redis client</td>
-  <td width="50%">With Momento's Redis compatibility client</td>
+ <td width="50%">With node-redis client</td>
+ <td width="50%">With Momento's Redis compatibility client</td>
 </tr>
 <tr>
-  <td width="50%" valign="top">
+ <td width="50%" valign="top">
 
 ```javascript
 // Import the redis module
@@ -33,8 +33,8 @@ const REDIS_PORT = 6379;
 const REDIS_PASSWORD = 'mypasswd';
 // Create a Redis client
 const redisClient = redis.createClient({
-    url: 'redis://${REDIS_HOST}:${REDIS_PORT}',
-    password: REDIS_PASSWORD
+  url: 'redis://${REDIS_HOST}:${REDIS_PORT}',
+  password: REDIS_PASSWORD
 });
 ```
 
@@ -46,24 +46,24 @@ const redisClient = redis.createClient({
 import {createClient, momento} from 'momento-redis-client';
 // Initialize Momento's client.
 const redisClient = createClient(
-  new momento.CacheClient({
-    configuration: momento.Configurations.Laptop.v1(),
-    credentialProvider: momento.CredentialProvider.fromEnvironmentVariable({
-      environmentVariableName: 'MOMENTO_AUTH_TOKEN',
-    }),
-    defaultTtlSeconds: 60,
+ new momento.CacheClient({
+  configuration: momento.Configurations.Laptop.v1(),
+  credentialProvider: momento.CredentialProvider.fromEnvironmentVariable({
+   environmentVariableName: 'MOMENTO_AUTH_TOKEN',
   }),
-  'cache_name'
+  defaultTtlSeconds: 60,
+ }),
+ 'cache_name'
 );
 ```
 
-  </td>
+ </td>
 </tr>
 </table>
 
 **NOTE**: The Momento `@redis/client` implementation currently supports simple key/value pairs (`GET`, `SET`) as well
-as hash values (`HGET`/`HSET`). If you need support for additional Redis functions, please contact us at [support@momentohq.com](mailto:support@momentohq.com)
-or join our [Discord](https://discord.com/invite/3HkAKjUZGq), and we will be happy to help!
+as hash values (`HGET`/`HSET`). We will continue to add support for additional Redis APIs in the future; for more
+information see the [Current Redis API Support](#current-redis-api-support) section later in this doc.
 
 ## Examples
 
@@ -150,5 +150,48 @@ Then, open a private/icognito browser window (or a different browser) and browse
 a fresh session with an independent counter.
 
 Voila! Your express.js session data is now stored in Momento!
+
+## Current Redis API Support
+
+This library supports the most popular Redis APIs, but does not yet support all Redis APIs. We currently support the most
+common APIs related to string values (GET, SET, etc.) and hash values (HGETALL, HSET, etc.). We will be adding support for additional
+APIs in the future. If there is a particular API that you need support for, please drop by our [Discord](https://discord.com/invite/3HkAKjUZGq)
+or e-mail us at [support@momentohq.com](mailto:support@momentohq.com) and let us know - we'll get it added for you ASAP!
+
+In the meantime, if you call a method from the `@redis/client` API that we do not yet support, you will get a `TypeError`
+letting you know that the method is not implemented yet.
+
+### TypeScript Compile-Time API Checking
+
+If you're using TypeScript, and you'd like compile-time checking to tell you if you are using any APIs that we don't yet
+support, we provide our own `IMomentoRedisClient` interface, which is a fully compatible subset of the official `@redis/client`
+interface but explicitly lists out the APIs that we currently support.
+
+So, you can make a one-line change to your constructor call and get back an instance of this interface instead of the
+default `@redis/client` type, and then the TypeScript compiler will catch any calls that your code is making to Redis
+API methods that we don't yet support, so you'll know before you even try to run the code.
+
+All you need to do is call the `createScopedClient` factory function instead of the `createClient` one that we showed
+above. Here's what it looks like:
+
+```javascript
+const client: IMomentoRedisClient =
+  createScopedClient(
+    new momento.CacheClient({
+      configuration: momento.Configurations.Laptop.v1(),
+      credentialProvider: momento.CredentialProvider.fromEnvironmentVariable({
+        environmentVariableName: 'MOMENTO_AUTH_TOKEN',
+      }),
+      defaultTtlSeconds: 60,
+    }),
+    'cache_name'
+  );
+```
+
+Exactly the same call as before other than the `createScopedClient` function name, and now you get compile-time
+compatibility checking!
+
+If you try this, and your code doesn't compile because we are missing APIs that you need, please do reach out to us!
+We'll get them added.
 
 {{ ossFooter }}
