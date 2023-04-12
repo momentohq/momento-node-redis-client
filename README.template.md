@@ -65,6 +65,15 @@ const redisClient = createClient(
 as hash values (`HGET`/`HSET`). We will continue to add support for additional Redis APIs in the future; for more
 information see the [Current Redis API Support](#current-redis-api-support) section later in this doc.
 
+## Installation
+
+The Momento Node.js redis client is [available on npm.js](https://www.npmjs.com/package/@gomomento-poc/node-redis-client).
+You can install it via:
+
+```bash
+npm install @gomomento-poc/node-redis-client
+```
+
 ## Examples
 
 ### Prerequisites

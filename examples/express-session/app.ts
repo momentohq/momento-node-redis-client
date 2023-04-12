@@ -1,7 +1,7 @@
 import express from 'express';
 import session from 'express-session';
 import RedisStore from 'connect-redis';
-import {createClient, momento} from 'momento-redis-client';
+import {createClient, momento} from '@gomomento-poc/node-redis-client';
 
 // Initialize client
 const redisClient = createClient(
