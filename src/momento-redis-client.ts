@@ -409,7 +409,7 @@ function addUnimplementedMethods(BaseClass: any) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
     BaseClass.prototype[methodName] = function (this: any): void {
       throw new TypeError(
-        `Command ${name} is not implemented in MomentoRedisClient`
+        `Command ${name} is not implemented in MomentoRedisClient.  But we would love to add it for you!  Please drop by our Discord at https://discord.com/invite/3HkAKjUZGq , or contact us at support@momentohq.com, and let us know what APIs you need!`
       );
     };
   }

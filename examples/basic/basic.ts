@@ -6,8 +6,8 @@ import {
 } from '@redis/client';
 import * as nodeRedis from '@redis/client';
 import {Command, Option, OptionValues} from 'commander';
-import * as momentoRedis from 'momento-redis-client';
-import {momento, commandOptions} from 'momento-redis-client';
+import * as momentoRedis from '@gomomento-poc/node-redis-client';
+import {momento, commandOptions} from '@gomomento-poc/node-redis-client';
 
 async function main(): Promise<void> {
   const options = parseCliOpts();
