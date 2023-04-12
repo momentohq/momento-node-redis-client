@@ -22,8 +22,8 @@ describe('unimplemented commands', () => {
     }
 
     await testAwaitedException(async () => {
-      await client.hGet('foo', 'bar');
-    }, 'Command hGet is not yet implemented in MomentoRedisClient. But we would love to add it for you!  Please drop by our Discord at https://discord.com/invite/3HkAKjUZGq , or contact us at support@momentohq.com, and let us know what APIs you need!');
+      await client.sAdd('foo', 'bar');
+    }, 'Command sAdd is not yet implemented in MomentoRedisClient. But we would love to add it for you!  Please drop by our Discord at https://discord.com/invite/3HkAKjUZGq , or contact us at support@momentohq.com, and let us know what APIs you need!');
 
     await testAwaitedException(async () => {
       await client.lPushX('foo', 'bar');
