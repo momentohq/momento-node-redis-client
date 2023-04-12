@@ -14,6 +14,8 @@ import {
   CacheDelete,
   CacheDictionaryFetch,
   CacheDictionarySetFields,
+  CacheDictionaryGetField,
+  CacheDictionaryGetFields,
 } from '@gomomento/sdk';
 
 import {IResponseError} from '@gomomento/sdk/dist/src/messages/responses/response-base';
@@ -41,6 +43,11 @@ type SetNXParams = [
 ];
 
 type HGetAllParams = [key: RedisCommandArgument];
+type HGetParams = [key: RedisCommandArgument, field: RedisCommandArgument];
+type HMGetParams = [
+  key: RedisCommandArgument,
+  fields: RedisCommandArgument | Array<RedisCommandArgument>
+];
 type HSetParams = Parameters<
   (typeof RedisCommands)['HSET']['transformArguments']
 >;
@@ -50,7 +57,10 @@ type CommandParams =
   | SetParams
   | SetNXParams
   | DelParams
-  | HSetParams;
+  | HSetParams
+  | HGetAllParams
+  | HMGetParams
+  | HGetParams;
 type WithOptionalOptions<T extends CommandParams> =
   | T
   | [options: ClientCommandOptions, ...args: T];
@@ -81,6 +91,14 @@ export interface IMomentoRedisClient {
     ...args: WithOptionalOptions<HGetAllParams>
   ): Promise<Record<string, RedisCommandArgument>>;
   HGETALL: IMomentoRedisClient['hGetAll'];
+  hGet(
+    ...args: WithOptionalOptions<HGetParams>
+  ): Promise<OptionalRedisCommandArgument>;
+  HGET: IMomentoRedisClient['hGet'];
+  hmGet(
+    ...args: WithOptionalOptions<HMGetParams>
+  ): Promise<Array<OptionalRedisCommandArgument>>;
+  HMGET: IMomentoRedisClient['hmGet'];
   hSet(...args: WithOptionalOptions<HSetParams>): Promise<number>;
   HSET: IMomentoRedisClient['hSet'];
 }
@@ -336,6 +354,90 @@ export class MomentoRedisClient
       this.emit('error', UNEXPECTED_RESPONSE);
     }
     return {};
+  }
+
+  public async hGet(
+    ...args: WithOptionalOptions<HGetParams>
+  ): Promise<OptionalRedisCommandArgument> {
+    const [returnBuffers, otherArgs] =
+      MomentoRedisClient.extractReturnBuffersOptionFromArgs(args);
+    return await this.sendHGet(returnBuffers, otherArgs);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/unbound-method
+  public HGET = this.hGet;
+
+  private async sendHGet(
+    returnBuffers: boolean,
+    [key, field]: HGetParams
+  ): Promise<OptionalRedisCommandArgument> {
+    const response = await this.client.dictionaryGetField(
+      this.cacheName,
+      key.toString(),
+      field.toString()
+    );
+    if (response instanceof CacheDictionaryGetField.Hit) {
+      if (returnBuffers) {
+        return Buffer.from(response.valueUint8Array());
+      } else {
+        return response.valueString();
+      }
+    } else if (response instanceof CacheDictionaryGetField.Miss) {
+      return null;
+    } else if (response instanceof CacheDictionaryGetField.Error) {
+      this.emitError(response);
+    } else {
+      this.emitError(UNEXPECTED_RESPONSE);
+    }
+    return null;
+  }
+
+  public async hmGet(
+    ...args: WithOptionalOptions<HMGetParams>
+  ): Promise<Array<OptionalRedisCommandArgument>> {
+    const [returnBuffers, otherArgs] =
+      MomentoRedisClient.extractReturnBuffersOptionFromArgs(args);
+    return await this.sendHMGet(returnBuffers, otherArgs);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/unbound-method
+  public HMGET = this.hmGet;
+
+  private async sendHMGet(
+    returnBuffers: boolean,
+    [key, fields]: HMGetParams
+  ): Promise<Array<OptionalRedisCommandArgument>> {
+    let fieldStrings: Array<string>;
+    if (Array.isArray(fields)) {
+      fieldStrings = fields.map(f => f.toString());
+    } else {
+      fieldStrings = [fields.toString()];
+    }
+
+    const response = await this.client.dictionaryGetFields(
+      this.cacheName,
+      key.toString(),
+      fieldStrings
+    );
+    if (response instanceof CacheDictionaryGetFields.Hit) {
+      if (returnBuffers) {
+        const record = response.valueMapStringUint8Array();
+        const result: Array<Buffer> = [];
+        for (const value of record.values()) {
+          result.push(Buffer.from(value));
+        }
+        return result;
+      } else {
+        return [...response.valueMap().values()];
+      }
+    } else if (response instanceof CacheDictionaryGetFields.Miss) {
+      return [];
+    } else if (response instanceof CacheDictionaryGetFields.Error) {
+      this.emit('error', response);
+    } else {
+      this.emit('error', UNEXPECTED_RESPONSE);
+    }
+    return [];
   }
 
   public async hSet(...args: WithOptionalOptions<HSetParams>): Promise<number> {
