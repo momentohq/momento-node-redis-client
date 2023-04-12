@@ -18,8 +18,8 @@ describe('hash', () => {
     const result = await client.hSet(key, field, value);
     expect(result).toBe(1);
 
-    const getResult = await client.hGetAll(key);
-    expect(getResult).toEqual({[field]: value});
+    const getAllResult = await client.hGetAll(key);
+    expect(getAllResult).toEqual({[field]: value});
   });
 
   it('should accept a number field and string value pair on hset', async () => {
@@ -71,8 +71,14 @@ describe('hash', () => {
     const result = await client.hSet(key, obj);
     expect(result).toBe(2);
 
-    const getResult = await client.hGetAll(key);
-    expect(getResult).toEqual(obj);
+    const getAllResult = await client.hGetAll(key);
+    expect(getAllResult).toEqual(obj);
+
+    const getResult = await client.hGet(key, field);
+    expect(getResult).toEqual(value);
+
+    const mgetResult = await client.hmGet(key, [field, field2]);
+    expect(mgetResult).toEqual([value, value2]);
   });
 
   it('should accept a Map<string, string> instance on hset', async () => {
