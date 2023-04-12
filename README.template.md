@@ -153,8 +153,8 @@ Voila! Your express.js session data is now stored in Momento!
 
 ## Current Redis API Support
 
-This library supports the most popular Redis APIs, but does not yet support all Redis APIs. We currently support most
-APIs related to string values (GET, SET, etc.) and hash values (HGET, HSET, etc.). We will be adding support for additional
+This library supports the most popular Redis APIs, but does not yet support all Redis APIs. We currently support the most
+common APIs related to string values (GET, SET, etc.) and hash values (HGETALL, HSET, etc.). We will be adding support for additional
 APIs in the future. If there is a particular API that you need support for, please drop by our [Discord](https://discord.com/invite/3HkAKjUZGq)
 or e-mail us at [support@momentohq.com](mailto:support@momentohq.com) and let us know - we'll get it added for you ASAP!
 
