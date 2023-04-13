@@ -220,7 +220,7 @@ export class MomentoRedisClient
       ttl = Math.floor((options.PXAT - Date.now()) / 1000);
     } else if (options?.KEEPTTL) {
       throw new TypeError(
-        'SetOption KEEPTTL is not yet implemented in MomentoRedisClient. But we would love to add it for you!  Please drop by our Discord at https://discord.com/invite/3HkAKjUZGq , or contact us at support@momentohq.com, and let us know what APIs you need!'
+        'SetOption KEEPTTL is not yet implemented in MomentoRedisClient. Please drop by our Discord at https://discord.com/invite/3HkAKjUZGq , or contact us at support@momentohq.com, and let us know what APIs you need!'
       );
     }
 
@@ -229,13 +229,13 @@ export class MomentoRedisClient
       return stored ? OK : null;
     } else if (options?.XX) {
       throw new TypeError(
-        'SetOption XX is not yet implemented in MomentoRedisClient. But we would love to add it for you!  Please drop by our Discord at https://discord.com/invite/3HkAKjUZGq , or contact us at support@momentohq.com, and let us know what APIs you need!'
+        'SetOption XX is not yet implemented in MomentoRedisClient. Please drop by our Discord at https://discord.com/invite/3HkAKjUZGq , or contact us at support@momentohq.com, and let us know what APIs you need!'
       );
     }
 
     if (options?.GET) {
       throw new TypeError(
-        'SetOption GET is not yet implemented in MomentoRedisClient. But we would love to add it for you!  Please drop by our Discord at https://discord.com/invite/3HkAKjUZGq , or contact us at support@momentohq.com, and let us know what APIs you need!'
+        'SetOption GET is not yet implemented in MomentoRedisClient. Please drop by our Discord at https://discord.com/invite/3HkAKjUZGq , or contact us at support@momentohq.com, and let us know what APIs you need!'
       );
     }
 
@@ -511,7 +511,7 @@ function addUnimplementedMethods(BaseClass: any) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
     BaseClass.prototype[methodName] = function (this: any): void {
       throw new TypeError(
-        `Command ${name} is not yet implemented in MomentoRedisClient. But we would love to add it for you!  Please drop by our Discord at https://discord.com/invite/3HkAKjUZGq , or contact us at support@momentohq.com, and let us know what APIs you need!`
+        `Command ${name} is not yet implemented in MomentoRedisClient. Please drop by our Discord at https://discord.com/invite/3HkAKjUZGq , or contact us at support@momentohq.com, and let us know what APIs you need!`
       );
     };
   }
