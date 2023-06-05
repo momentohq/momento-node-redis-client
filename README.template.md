@@ -9,7 +9,7 @@ The goal is to provide a drop-in replacement for [@redis/client](https://github.
 use the same code with either a Redis server or with the Momento Cache service!
 
 You can use Momento as your cache engine for any node.js frameworks that support a redis-backed cache,
-such as [Express.js](https://github.com/expressjs/express). See the [Examples](#examples) section for more info.
+such as [Express.js](https://github.com/expressjs/express). See the [examples](#examples) section for more info.
 
 ## Usage
 
@@ -43,7 +43,7 @@ const redisClient = redis.createClient({
 
 ```javascript
 // Import the Momento redis compatibility client.
-import {createClient, momento} from 'momento-redis-client';
+import {createClient, momento} from '@gomomento-poc/node-redis-client';
 // Initialize Momento's client.
 const redisClient = createClient(
  new momento.CacheClient({
@@ -63,7 +63,7 @@ const redisClient = createClient(
 
 **NOTE**: The Momento `@redis/client` implementation currently supports simple key/value pairs (`GET`, `SET`) as well
 as hash values (`HGET`/`HSET`). We will continue to add support for additional Redis APIs in the future; for more
-information see the [Current Redis API Support](#current-redis-api-support) section later in this doc.
+information see the [current Redis API support](#current-redis-api-support) section later in this doc.
 
 ## Installation
 
