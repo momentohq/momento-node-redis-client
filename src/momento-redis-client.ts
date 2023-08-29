@@ -18,8 +18,6 @@ import {
   CacheDictionaryGetFields,
 } from '@gomomento/sdk';
 
-import {IResponseError} from '@gomomento/sdk/dist/src/messages/responses/response-base';
-
 import {ClientCommandOptions} from '@redis/client/dist/lib/client';
 import {isCommandOptions} from '@redis/client/dist/lib/command-options';
 import RedisCommands from '@redis/client/dist/lib/cluster/commands';
@@ -474,9 +472,9 @@ export class MomentoRedisClient
     return 0;
   }
 
-  private emitError(error: IResponseError | ErrorReply): void {
+  private emitError(error: {toString(): string} | ErrorReply): void {
     const errorReply =
-      error instanceof ErrorReply ? error : new ErrorReply(error.message());
+      error instanceof ErrorReply ? error : new ErrorReply(error.toString());
     this.emit('error', errorReply);
   }
 }

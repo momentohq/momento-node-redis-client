@@ -68,22 +68,22 @@ function getRedisUrl() {
   return `redis://${redisHost}:${redisPort}`;
 }
 
-export function SetupIntegrationTest(): {
+export async function SetupIntegrationTest(): Promise<{
   client: RedisClientType<RedisModules, RedisFunctions, RedisScripts>;
-} {
+}> {
   if (isRedisBackedTest()) {
     return setupIntegrationTestWithRedis();
   } else {
-    return setupIntegrationTestWithMomento();
+    return await setupIntegrationTestWithMomento();
   }
 }
 
-function setupIntegrationTestWithMomento() {
+async function setupIntegrationTestWithMomento() {
   const cacheName = testCacheName();
 
   beforeAll(async () => {
     // Use a fresh client to avoid test interference with setup.
-    const momento = momentoClientForTesting();
+    const momento = await momentoClientForTesting();
     await deleteCacheIfExists(momento, cacheName);
     const createResponse = await momento.createCache(cacheName);
     if (createResponse instanceof CreateCache.Error) {
@@ -93,14 +93,14 @@ function setupIntegrationTestWithMomento() {
 
   afterAll(async () => {
     // Use a fresh client to avoid test interference with teardown.
-    const momento = momentoClientForTesting();
+    const momento = await momentoClientForTesting();
     const deleteResponse = await momento.deleteCache(cacheName);
     if (deleteResponse instanceof DeleteCache.Error) {
       throw deleteResponse.innerException();
     }
   });
 
-  const momentoClient = momentoClientForTesting();
+  const momentoClient = await momentoClientForTesting();
   const momentoNodeRedisClient = createMomentoBackedClient(
     momentoClient,
     cacheName
