@@ -55,7 +55,7 @@ function momentoClientForTesting() {
     }),
     defaultTtlSeconds: 60,
   };
-  return CacheClient.create(IntegrationTestCacheClientProps);
+  return new CacheClient(IntegrationTestCacheClientProps);
 }
 
 export function isRedisBackedTest() {
@@ -68,22 +68,22 @@ function getRedisUrl() {
   return `redis://${redisHost}:${redisPort}`;
 }
 
-export async function SetupIntegrationTest(): Promise<{
+export function SetupIntegrationTest(): {
   client: RedisClientType<RedisModules, RedisFunctions, RedisScripts>;
-}> {
+} {
   if (isRedisBackedTest()) {
     return setupIntegrationTestWithRedis();
   } else {
-    return await setupIntegrationTestWithMomento();
+    return setupIntegrationTestWithMomento();
   }
 }
 
-async function setupIntegrationTestWithMomento() {
+function setupIntegrationTestWithMomento() {
   const cacheName = testCacheName();
 
   beforeAll(async () => {
     // Use a fresh client to avoid test interference with setup.
-    const momento = await momentoClientForTesting();
+    const momento = momentoClientForTesting();
     await deleteCacheIfExists(momento, cacheName);
     const createResponse = await momento.createCache(cacheName);
     if (createResponse instanceof CreateCache.Error) {
@@ -93,14 +93,14 @@ async function setupIntegrationTestWithMomento() {
 
   afterAll(async () => {
     // Use a fresh client to avoid test interference with teardown.
-    const momento = await momentoClientForTesting();
+    const momento = momentoClientForTesting();
     const deleteResponse = await momento.deleteCache(cacheName);
     if (deleteResponse instanceof DeleteCache.Error) {
       throw deleteResponse.innerException();
     }
   });
 
-  const momentoClient = await momentoClientForTesting();
+  const momentoClient = momentoClientForTesting();
   const momentoNodeRedisClient = createMomentoBackedClient(
     momentoClient,
     cacheName
