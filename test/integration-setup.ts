@@ -55,7 +55,7 @@ function momentoClientForTesting() {
     }),
     defaultTtlSeconds: 60,
   };
-  return new CacheClient(IntegrationTestCacheClientProps);
+  return CacheClient.create(IntegrationTestCacheClientProps);
 }
 
 export function isRedisBackedTest() {

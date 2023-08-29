@@ -46,7 +46,7 @@ const redisClient = redis.createClient({
 import {createClient, momento} from '@gomomento-poc/node-redis-client';
 // Initialize Momento's client.
 const redisClient = createClient(
- new momento.CacheClient({
+ await momento.CacheClient.create({
   configuration: momento.Configurations.Laptop.v1(),
   credentialProvider: momento.CredentialProvider.fromEnvironmentVariable({
    environmentVariableName: 'MOMENTO_AUTH_TOKEN',
@@ -186,7 +186,7 @@ above. Here's what it looks like:
 ```javascript
 const client: IMomentoRedisClient =
   createScopedClient(
-    new momento.CacheClient({
+    await new momento.CacheClient.create({
       configuration: momento.Configurations.Laptop.v1(),
       credentialProvider: momento.CredentialProvider.fromEnvironmentVariable({
         environmentVariableName: 'MOMENTO_AUTH_TOKEN',
