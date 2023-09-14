@@ -32,12 +32,10 @@
     "node": ">= 14"
   },
   "dependencies": {
+    "@gomomento-poc/node-redis-client": "0.2.0",
     "@redis/client": "^1.5.6",
     "@types/commander": "^2.12.2",
-    "@types/uuid": "^9.0.1",
-    "commander": "^10.0.0",
-    "@gomomento-poc/node-redis-client": "0.2.0",
-    "uuid": "^9.0.0"
+    "commander": "^10.0.0"
   },
   "prettier": {
     "bracketSpacing": false,
