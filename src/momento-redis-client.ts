@@ -16,9 +16,8 @@ import {
   CacheDictionarySetFields,
   CacheDictionaryGetField,
   CacheDictionaryGetFields,
+  SdkError,
 } from '@gomomento/sdk';
-
-import {IResponseError} from '@gomomento/sdk/dist/src/messages/responses/response-base';
 
 import {ClientCommandOptions} from '@redis/client/dist/lib/client';
 import {isCommandOptions} from '@redis/client/dist/lib/command-options';
@@ -70,7 +69,9 @@ type OptionalRedisCommandArgument = RedisCommandArgument | null;
 const UNEXPECTED_RESPONSE = new ErrorReply('Unexpected response');
 
 export interface IMomentoRedisClient {
-  connect(): Promise<void>;
+  connect(): Promise<
+    RedisClientType<RedisModules, RedisFunctions, RedisScripts>
+  >;
   disconnect(): Promise<void>;
   isOpen: boolean;
 
@@ -131,10 +132,16 @@ export class MomentoRedisClient
     return this._isOpen;
   }
 
-  public async connect(): Promise<void> {
-    // TODO this should be ping once it is in the client
-    await this.get('sRITPPymF1yEB6rFizrI0ZeCMq012uXFjBNRNokAv4');
+  public async connect(): Promise<
+    RedisClientType<RedisModules, RedisFunctions, RedisScripts>
+  > {
+    await this.client.ping();
     this._isOpen = true;
+    return this as unknown as RedisClientType<
+      RedisModules,
+      RedisFunctions,
+      RedisScripts
+    >;
   }
 
   public async disconnect(): Promise<void> {
@@ -182,7 +189,7 @@ export class MomentoRedisClient
     } else if (response instanceof CacheGet.Miss) {
       return null;
     } else if (response instanceof CacheGet.Error) {
-      this.emitError(response);
+      this.emitError(response.innerException());
     } else {
       this.emitError(UNEXPECTED_RESPONSE);
     }
@@ -385,7 +392,7 @@ export class MomentoRedisClient
     } else if (response instanceof CacheDictionaryGetField.Miss) {
       return null;
     } else if (response instanceof CacheDictionaryGetField.Error) {
-      this.emitError(response);
+      this.emitError(response.innerException());
     } else {
       this.emitError(UNEXPECTED_RESPONSE);
     }
@@ -474,9 +481,11 @@ export class MomentoRedisClient
     return 0;
   }
 
-  private emitError(error: IResponseError | ErrorReply): void {
+  private emitError(error: SdkError | ErrorReply): void {
     const errorReply =
-      error instanceof ErrorReply ? error : new ErrorReply(error.message());
+      error instanceof ErrorReply
+        ? error
+        : new ErrorReply(error.wrappedErrorMessage());
     this.emit('error', errorReply);
   }
 }
