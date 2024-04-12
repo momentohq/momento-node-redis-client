@@ -137,10 +137,11 @@ export class MomentoRedisClient
   > {
     await this.client.ping();
     this._isOpen = true;
-    return new MomentoRedisClient(
-      this.client,
-      this.cacheName
-    ) as unknown as RedisClientType<RedisModules, RedisFunctions, RedisScripts>;
+    return this as unknown as RedisClientType<
+      RedisModules,
+      RedisFunctions,
+      RedisScripts
+    >;
   }
 
   public async disconnect(): Promise<void> {
