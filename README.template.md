@@ -1,15 +1,15 @@
 {{ ossHeader }}
 
-# Momento Node.js Redis Client
+# Momento Node.js Redis compatibility client
 
 ## What and why?
 
 This project provides a Momento-backed implementation of [@redis/client](https://github.com/redis/node-redis)
 The goal is to provide a drop-in replacement for [@redis/client](https://github.com/redis/node-redis) so that you can
-use the same code with either a Redis server or with Momento serverless cache!
+use the same code with either a Redis server or with the Momento Cache service!
 
 You can use Momento as your cache engine for any node.js frameworks that support a redis-backed cache,
-such as [Express.js](https://github.com/expressjs/express). See the [Examples](#examples) section for more info.
+such as [Express.js](https://github.com/expressjs/express). See the [examples](#examples) section for more info.
 
 ## Usage
 
@@ -43,7 +43,7 @@ const redisClient = redis.createClient({
 
 ```javascript
 // Import the Momento redis compatibility client.
-import {createClient, momento} from 'momento-redis-client';
+import {createClient, momento} from '@gomomento-poc/node-redis-client';
 // Initialize Momento's client.
 const redisClient = createClient(
  new momento.CacheClient({
@@ -63,11 +63,11 @@ const redisClient = createClient(
 
 **NOTE**: The Momento `@redis/client` implementation currently supports simple key/value pairs (`GET`, `SET`) as well
 as hash values (`HGET`/`HSET`). We will continue to add support for additional Redis APIs in the future; for more
-information see the [Current Redis API Support](#current-redis-api-support) section later in this doc.
+information see the [current Redis API support](#current-redis-api-support) section later in this doc.
 
 ## Installation
 
-The Momento Node.js redis client is [available on npm.js](https://www.npmjs.com/package/@gomomento-poc/node-redis-client).
+The Momento Node.js Redis compatibility client is [available on npm.js](https://www.npmjs.com/package/@gomomento-poc/node-redis-client).
 You can install it via:
 
 ```bash
@@ -78,7 +78,7 @@ npm install @gomomento-poc/node-redis-client
 
 ### Prerequisites
 
-To run these examples, you will need a Momento Auth Token. You can generate one using the [Momento CLI](https://github.com/momentohq/momento-cli).
+To run these examples, you will need a Momento auth token. You can generate one using the [Momento CLI](https://github.com/momentohq/momento-cli).
 
 The examples will utlize your auth token via the environment variable `MOMENTO_AUTH_TOKEN` you set.
 
@@ -91,7 +91,7 @@ a local Redis (127.0.0.0:6379).
 You can run the example via `npm run basic`. To pass CLI options you will need to pass an extra `--` to tell `npm` that
 the following options should be passed through.
 
-Here's an example run against Momento:
+Here's an example run against Momento Cache:
 
 ```bash
 cd examples/basic
@@ -165,7 +165,7 @@ Voila! Your express.js session data is now stored in Momento!
 This library supports the most popular Redis APIs, but does not yet support all Redis APIs. We currently support the most
 common APIs related to string values (GET, SET, etc.) and hash values (HGETALL, HSET, etc.). We will be adding support for additional
 APIs in the future. If there is a particular API that you need support for, please drop by our [Discord](https://discord.com/invite/3HkAKjUZGq)
-or e-mail us at [support@momentohq.com](mailto:support@momentohq.com) and let us know - we'll get it added for you ASAP!
+or e-mail us at [support@momentohq.com](mailto:support@momentohq.com) and let us know!
 
 In the meantime, if you call a method from the `@redis/client` API that we do not yet support, you will get a `TypeError`
 letting you know that the method is not implemented yet.
@@ -201,6 +201,5 @@ Exactly the same call as before other than the `createScopedClient` function nam
 compatibility checking!
 
 If you try this, and your code doesn't compile because we are missing APIs that you need, please do reach out to us!
-We'll get them added.
 
 {{ ossFooter }}
