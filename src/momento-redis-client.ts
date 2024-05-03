@@ -17,6 +17,7 @@ import {
   CacheDictionaryGetField,
   CacheDictionaryGetFields,
   SdkError,
+  CacheIncrement,
 } from '@gomomento/sdk';
 
 import {ClientCommandOptions} from '@redis/client/dist/lib/client';
@@ -50,6 +51,7 @@ type HMGetParams = [
 type HSetParams = Parameters<
   (typeof RedisCommands)['HSET']['transformArguments']
 >;
+type IncrementParams = [key: RedisCommandArgument];
 
 type CommandParams =
   | GetParams
@@ -59,7 +61,8 @@ type CommandParams =
   | HSetParams
   | HGetAllParams
   | HMGetParams
-  | HGetParams;
+  | HGetParams
+  | IncrementParams;
 type WithOptionalOptions<T extends CommandParams> =
   | T
   | [options: ClientCommandOptions, ...args: T];
@@ -102,6 +105,8 @@ export interface IMomentoRedisClient {
   HMGET: IMomentoRedisClient['hmGet'];
   hSet(...args: WithOptionalOptions<HSetParams>): Promise<number>;
   HSET: IMomentoRedisClient['hSet'];
+  incr(...args: WithOptionalOptions<IncrementParams>): Promise<number | null>;
+  INCR: IMomentoRedisClient['incr'];
 }
 
 export class MomentoRedisClient
@@ -479,6 +484,29 @@ export class MomentoRedisClient
       this.emit('error', UNEXPECTED_RESPONSE);
     }
     return 0;
+  }
+
+  public async incr(
+    ...args: WithOptionalOptions<IncrementParams>
+  ): Promise<number | null> {
+    const [, otherArgs] =
+      MomentoRedisClient.extractReturnBuffersOptionFromArgs(args);
+    return await this.sendIncr(otherArgs as IncrementParams);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/unbound-method
+  public INCR = this.incr;
+
+  private async sendIncr([key]: IncrementParams): Promise<number | null> {
+    const response = await this.client.increment(this.cacheName, key);
+    if (response instanceof CacheIncrement.Success) {
+      return response.value();
+    } else if (response instanceof CacheIncrement.Error) {
+      this.emitError(response.innerException());
+    } else {
+      this.emitError(UNEXPECTED_RESPONSE);
+    }
+    return null;
   }
 
   private emitError(error: SdkError | ErrorReply): void {
