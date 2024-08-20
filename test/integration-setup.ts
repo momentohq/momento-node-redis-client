@@ -49,7 +49,7 @@ export async function WithCache(
 
 function momentoClientForTesting() {
   const IntegrationTestCacheClientProps: CacheClientProps = {
-    configuration: Configurations.Lambda.latest().withClientTimeoutMillis(15000),
+    configuration: Configurations.Laptop.latest(),
     credentialProvider: CredentialProvider.fromEnvironmentVariable({
       environmentVariableName: 'TEST_AUTH_TOKEN',
     }),
